@@ -3371,21 +3371,17 @@ class TerritoryApp {
     }
 
     setupEventListeners() {
-        // Modal event listener
-        const modal = document.getElementById("exampleModal");
-        if (modal) {
-            modal.addEventListener("show.bs.modal", (event) => {
-                const button = event.relatedTarget;
-                const streetName = button.getAttribute("data-bs-whatever");
-
-                modal.querySelector(".modal-title").textContent = streetName;
-                modal.querySelector(".modal-body input").value = streetName;
-            });
-        }
-
         // Global functions for onclick handlers
         window.listStreets = () => this.displayStreets();
         window.copyDivToClipboard = () => this.copyToClipboard();
+        
+        // Modal functions
+        window.openStreetModal = (streetName) => {
+            const modal = document.getElementById("exampleModal");
+            modal.querySelector(".modal-title").textContent = streetName;
+            modal.querySelector(".modal-body input").value = streetName;
+            openModal();
+        };
     }
 
     generateApartmentButtons() {
@@ -3409,7 +3405,7 @@ class TerritoryApp {
     displayStreets() {
         const streets = this.getSortedStreets();
         const streetButtons = streets.map(streetName =>
-            `<br><button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="${streetName}" data-bs-name="${streetName}">${streetName}</button>`
+            `<br><button type="button" class="btn btn-link" onclick="openStreetModal('${streetName}')">${streetName}</button>`
         ).join('');
 
         document.getElementById("territory").innerHTML = `<div>${streetButtons}</div>`;
@@ -3530,8 +3526,7 @@ class TerritoryApp {
     }
 
     closeModal() {
-        const modal = bootstrap.Modal.getInstance(document.getElementById("exampleModal"));
-        if (modal) modal.hide();
+        closeModal();
     }
 
     async copyToClipboard() {
