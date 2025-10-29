@@ -2,6 +2,12 @@
 class TerritoryApp {
     constructor() {
         this.data = {
+            "Лысогорская": [
+                [
+                    "87а",
+                    51
+                ],
+            ],
             "Заиграевская": [
                 [
                     "1",
@@ -3382,15 +3388,21 @@ class TerritoryApp {
             modal.querySelector(".modal-body input").value = streetName;
             openModal();
         };
+
+
     }
 
     generateApartmentButtons() {
         const container = document.getElementById("apartment-buttons");
         if (!container) return;
 
+        // Clear existing buttons
+        container.innerHTML = '';
+
         const fragment = document.createDocumentFragment();
 
-        for (let i = 1; i <= 20; i++) {
+        // Always show numbers 1-50, regardless of step
+        for (let i = 1; i <= 50; i++) {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "btn btn-secondary";
@@ -3487,6 +3499,10 @@ class TerritoryApp {
         let currentApartment = apartmentNumber;
         let hasApartments = false;
 
+        // Get the step from the selector
+        const stepSelector = document.getElementById("step-selector");
+        const step = stepSelector ? parseInt(stepSelector.value) : 20;
+
         while (currentApartment <= maxApartment) {
             if (currentApartment >= startApartment) {
                 if (!hasApartments) {
@@ -3496,7 +3512,7 @@ class TerritoryApp {
                 html += `${currentApartment}<br>`;
                 this.apartmentCount++;
             }
-            currentApartment += 20;
+            currentApartment += step;
         }
 
         return html;

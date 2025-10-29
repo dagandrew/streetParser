@@ -37,6 +37,10 @@ h1 {
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+select.form-control {
+    cursor: pointer;
+}
+
 .form-control:focus {
     border-color: #86b7fe;
     outline: 0;
