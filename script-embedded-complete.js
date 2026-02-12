@@ -2,7 +2,7 @@
 class TerritoryApp {
     constructor() {
         this.data = {
-"Юного коммунара": [
+"Юного Коммунара": [
 [
 "1",
 584
