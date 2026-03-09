@@ -263,8 +263,16 @@
             margin: 0;
         }
 
-        #apartment-buttons .btn:hover {
+        #apartment-buttons .btn:hover:not(:disabled) {
             background: #555;
+        }
+
+        /* Disabled apartment buttons */
+        #apartment-buttons .btn:disabled {
+            background: #ccc;
+            color: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
         /* Results */
@@ -302,7 +310,6 @@
 
 <body>
     <div class="container">
-        <h1>Выберите улицу:</h1>
 
         <div class="letter-nav" id="letter-nav"></div>
 
@@ -367,6 +374,7 @@
 class TerritoryApp {
     constructor() {
         // ADD YOUR DATA HERE
+        // Format: "Street Name": [[building, maxApartment, startApartment?], ...]
         this.data = {
             "Родины": [
 ["3", 50],
@@ -3821,6 +3829,13 @@ class TerritoryApp {
             this.generateApartmentButtons();
         });
 
+        // Radio buttons change listener - regenerate buttons
+        document.querySelectorAll('input[name="house-type"]').forEach(radio => {
+            radio.addEventListener("change", () => {
+                this.generateApartmentButtons();
+            });
+        });
+
         // Letter navigation
         window.scrollToLetter = (letter) => {
             const letterGroup = document.getElementById('letter-' + letter);
@@ -3837,6 +3852,41 @@ class TerritoryApp {
         };
     }
 
+    // Check if an apartment number would yield results
+    wouldYieldResults(apartmentNumber, streetName, filterType, step) {
+        const buildings = this.getFilteredBuildingsForCheck(streetName, filterType);
+        
+        for (const building of buildings) {
+            const [, maxApartment, startApartment = 1] = building;
+            let currentApartment = apartmentNumber;
+            
+            while (currentApartment <= maxApartment) {
+                if (currentApartment >= startApartment) {
+                    return true; // Found at least one valid apartment
+                }
+                currentApartment += step;
+            }
+        }
+        
+        return false;
+    }
+
+    // Get filtered buildings without modifying state (for checking)
+    getFilteredBuildingsForCheck(streetName, filterType) {
+        const buildings = this.data[streetName] || [];
+        
+        if (filterType === 'all') {
+            return this.sortBuildings(buildings);
+        }
+
+        return this.sortBuildings(buildings.filter(building => {
+            const buildingNumber = this.extractBuildingNumber(building[0]);
+            if (filterType === 'odd' && buildingNumber % 2 !== 1) return false;
+            if (filterType === 'even' && buildingNumber % 2 !== 0) return false;
+            return true;
+        }));
+    }
+
     generateApartmentButtons() {
         const container = document.getElementById("apartment-buttons");
         if (!container) return;
@@ -3847,6 +3897,11 @@ class TerritoryApp {
         // Get the step from the selector
         const stepSelector = document.getElementById("step-selector");
         const step = stepSelector ? parseInt(stepSelector.value) : 20;
+
+        // Get the current street and filter type
+        const streetName = document.getElementById("recipient-name").value;
+        const selectedRadio = document.querySelector('input[name="house-type"]:checked');
+        const filterType = selectedRadio ? selectedRadio.value : 'all';
 
         // Store reference to this
         const self = this;
@@ -3859,10 +3914,20 @@ class TerritoryApp {
             button.type = "button";
             button.className = "btn";
             button.textContent = i.toString();
+            
+            // Check if this button would yield results
+            const wouldHaveResults = streetName && this.data[streetName] 
+                ? this.wouldYieldResults(i, streetName, filterType, step)
+                : true; // Default to enabled if no street selected
+            
+            button.disabled = !wouldHaveResults;
+            
             // Use closure to capture the correct value
             (function(num) {
                 button.onclick = function() {
-                    self.searchApartments(num);
+                    if (!this.disabled) {
+                        self.searchApartments(num);
+                    }
                 };
             })(i);
             container.appendChild(button);
@@ -3874,7 +3939,7 @@ class TerritoryApp {
         
         // Show letter nav and reset title
         document.getElementById("letter-nav").style.display = "flex";
-        document.querySelector("h1").textContent = "Выберите улицу:";
+        document.querySelector("h1").textContent = "Улицы";
         
         // Generate letter navigation
         this.generateLetterNav(streets);
@@ -3978,12 +4043,6 @@ class TerritoryApp {
         this.apartmentCount = 0;
         const streetName = document.getElementById("recipient-name").value;
 
-        if (!streetName || !this.data[streetName]) {
-            this.showNoResults(streetName || "Неизвестная улица");
-            this.closeModal();
-            return;
-        }
-
         const buildings = this.getFilteredBuildings(streetName);
         const resultHtml = this.generateResultsHtml(apartmentNumber, buildings, streetName);
 
@@ -4068,10 +4127,6 @@ class TerritoryApp {
     }
 
     displayResults(html, streetName) {
-        if (this.apartmentCount === 0) {
-            this.showNoResults(streetName);
-            return;
-        }
 
         // Hide letter nav and show street name
         document.getElementById("letter-nav").style.display = "none";
@@ -4085,17 +4140,6 @@ class TerritoryApp {
         }
 
         window.scrollTo(0, 0);
-    }
-
-    showNoResults(streetName) {
-        // Hide letter nav and show street name
-        document.getElementById("letter-nav").style.display = "none";
-        document.querySelector("h1").textContent = streetName;
-
-        document.getElementById("territory").innerHTML = `
-            <button type="button" onclick="listStreets()" class="btn btn-primary">Вернуться</button> 
-            <hr>Нет подходящих квартир
-        `;
     }
 
     closeModal() {
