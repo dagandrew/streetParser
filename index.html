@@ -5,12 +5,306 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Улицы</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        /* Letter Navigation */
+        .letter-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f5f5f5;
+        }
+
+        .letter-nav button {
+            min-width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .letter-nav button:hover {
+            background: #333;
+            color: white;
+        }
+
+        .letter-nav button.active {
+            background: #333;
+            color: white;
+        }
+
+        /* Street List with Letter Groups */
+        #territory {
+            padding-right: 10px;
+        }
+
+        .letter-header {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            padding: 10px 0 5px 0;
+            border-bottom: 2px solid #333;
+            margin-bottom: 5px;
+            margin-top: 15px;
+            background: white;
+        }
+
+        .letter-header:first-child {
+            margin-top: 0;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 8px 12px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .btn-link:hover {
+            background: #f0f0f0;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            border: 1px solid #333;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            margin: 5px;
+            background: white;
+            color: #333;
+        }
+
+        .btn-primary {
+            background: #333;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #555;
+        }
+
+        .btn-secondary {
+            background: #666;
+            color: white;
+            border-color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #888;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-dialog {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            background: #333;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 18px;
+            color: white;
+        }
+
+        .btn-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+        }
+
+        .btn-close:hover {
+            color: #ccc;
+        }
+
+        .modal-body {
+            padding: 15px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #333;
+        }
+
+        /* Radio Buttons */
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+        }
+
+        .radio-option:hover {
+            border-color: #333;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            font-weight: 600;
+        }
+
+        .radio-option:has(input[type="radio"]:checked) {
+            border-color: #333;
+            background: #f0f0f0;
+        }
+
+        .radio-label {
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* Apartment Buttons */
+        #apartment-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        #apartment-buttons .btn {
+            min-width: 45px;
+            padding: 8px 12px;
+            background: #333;
+            color: white;
+            margin: 0;
+        }
+
+        #apartment-buttons .btn:hover {
+            background: #555;
+        }
+
+        /* Results */
+        #territory b {
+            color: #333;
+            font-size: 16px;
+        }
+
+        #territory-count {
+            font-size: 14px;
+            color: #666;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 10px 0;
+        }
+
+        #step-selector {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+        }
+
+        #step-selector:focus {
+            outline: none;
+            border-color: #333;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
         <h1>Выберите улицу:</h1>
+
+        <div class="letter-nav" id="letter-nav"></div>
 
         <div id="territory"></div>
 
@@ -25,16 +319,24 @@
                     <div class="modal-body">
                         <form>
                             <div class="form-group">
-                                <input type="text" class="form-control" id="recipient-name">
+                                <label style="font-weight: 600; margin-bottom: 8px; display: block;">Тип домов:</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="house-type" id="all" value="all" checked>
+                                        <span class="radio-label">Все</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="house-type" id="even" value="even">
+                                        <span class="radio-label">Четные дома</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="house-type" id="odd" value="odd">
+                                        <span class="radio-label">Нечетные дома</span>
+                                    </label>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <input type="checkbox" id="even" />
-                                <label for="even">Четные дома</label>
-                                <input type="checkbox" id="odd" />
-                                <label for="odd">Нечетные дома</label>
-                            </div>
-                            <div class="form-group">
-                                <label for="step-selector">Шаг квартир:</label>
+                                <label for="step-selector" style="font-weight: 600; margin-bottom: 8px; display: block;">Шаг квартир:</label>
                                 <select id="step-selector" class="form-control">
                                     <option value="1">1 (каждая квартира)</option>
                                     <option value="5">5</option>
@@ -56,12 +358,12 @@
             </div>
         </div>
     </div>
-    
 
     <script>
 // Territory Management Application with Embedded Data
 class TerritoryApp {
     constructor() {
+        // ADD YOUR DATA HERE
         this.data = {
             "Родины": [
 ["3", 50],
@@ -3478,7 +3780,6 @@ class TerritoryApp {
                 ]
             ]
         };
-
         this.apartmentCount = 0;
         this.init();
     }
@@ -3499,10 +3800,38 @@ class TerritoryApp {
             const modal = document.getElementById("exampleModal");
             modal.querySelector(".modal-title").textContent = streetName;
             modal.querySelector(".modal-body input").value = streetName;
+            
+            // Reset radio buttons to "Все"
+            document.getElementById("all").checked = true;
+            
+            // Reset step selector to default (20)
+            document.getElementById("step-selector").value = "20";
+            
+            // Regenerate apartment buttons for default step
+            this.generateApartmentButtons();
+            
             openModal();
         };
 
+        // Step selector change listener - regenerate buttons
+        document.getElementById("step-selector").addEventListener("change", () => {
+            this.generateApartmentButtons();
+        });
 
+        // Letter navigation
+        window.scrollToLetter = (letter) => {
+            const letterGroup = document.getElementById('letter-' + letter);
+            
+            if (letterGroup) {
+                letterGroup.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Update active state
+                document.querySelectorAll('.letter-nav button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById('nav-' + letter)?.classList.add('active');
+            }
+        };
     }
 
     generateApartmentButtons() {
@@ -3514,11 +3843,17 @@ class TerritoryApp {
 
         const fragment = document.createDocumentFragment();
 
-        // Always show numbers 1-50, regardless of step
-        for (let i = 1; i <= 50; i++) {
+        // Get the step from the selector
+        const stepSelector = document.getElementById("step-selector");
+        const step = stepSelector ? parseInt(stepSelector.value) : 20;
+
+        // Show buttons from 1 to step value
+        const maxButton = step;
+        
+        for (let i = 1; i <= maxButton; i++) {
             const button = document.createElement("button");
             button.type = "button";
-            button.className = "btn btn-secondary";
+            button.className = "btn";
             button.textContent = i.toString();
             button.onclick = () => this.searchApartments(i);
             fragment.appendChild(button);
@@ -3529,11 +3864,102 @@ class TerritoryApp {
 
     displayStreets() {
         const streets = this.getSortedStreets();
-        const streetButtons = streets.map(streetName =>
-            `<br><button type="button" class="btn btn-link" onclick="openStreetModal('${streetName}')">${streetName}</button>`
-        ).join('');
+        
+        // Show letter nav and reset title
+        document.getElementById("letter-nav").style.display = "flex";
+        document.querySelector("h1").textContent = "Выберите улицу:";
+        
+        // Generate letter navigation
+        this.generateLetterNav(streets);
+        
+        // Group streets by first letter
+        const groupedStreets = this.groupStreetsByLetter(streets);
+        
+        let html = '';
+        for (const [letter, letterStreets] of Object.entries(groupedStreets)) {
+            html += `<div class="letter-group" id="letter-${letter}">`;
+            html += `<div class="letter-header">${letter}</div>`;
+            
+            letterStreets.forEach(streetName => {
+                html += `<button type="button" class="btn-link" onclick="openStreetModal('${streetName}')">${streetName}</button>`;
+            });
+            
+            html += `</div>`;
+        }
+        
+        document.getElementById("territory").innerHTML = html;
+    }
 
-        document.getElementById("territory").innerHTML = `<div>${streetButtons}</div>`;
+    generateLetterNav(streets) {
+        // Check if there are any streets starting with numbers
+        const hasNumbers = streets.some(street => /\d/.test(street.charAt(0)));
+        
+        // Get letters that actually have streets
+        const availableLetters = new Set();
+        
+        streets.forEach(street => {
+            const firstChar = street.charAt(0).toUpperCase();
+            if (!/\d/.test(firstChar)) {
+                availableLetters.add(firstChar);
+            }
+        });
+
+        // Sort letters by Russian alphabet order
+        const russianOrder = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯ';
+        const sortedLetters = [...availableLetters].sort((a, b) => {
+            return russianOrder.indexOf(a) - russianOrder.indexOf(b);
+        });
+
+        let html = '';
+        
+        // Add 1-9 button first if there are numeric streets
+        if (hasNumbers) {
+            html += `<button type="button" 
+                        id="nav-1-9"
+                        onclick="scrollToLetter('1-9')">1-9</button>`;
+        }
+        
+        // Add letter buttons
+        for (const letter of sortedLetters) {
+            html += `<button type="button" 
+                        id="nav-${letter}"
+                        onclick="scrollToLetter('${letter}')">${letter}</button>`;
+        }
+        
+        document.getElementById("letter-nav").innerHTML = html;
+    }
+
+    groupStreetsByLetter(streets) {
+        const grouped = {};
+        
+        streets.forEach(street => {
+            const firstChar = street.charAt(0).toUpperCase();
+            // Group all numeric-starting streets under '1-9'
+            const groupKey = /\d/.test(firstChar) ? '1-9' : firstChar;
+            
+            if (!grouped[groupKey]) {
+                grouped[groupKey] = [];
+            }
+            grouped[groupKey].push(street);
+        });
+        
+        // Sort: 1-9 first, then by Russian alphabet
+        const russianOrder = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯ';
+        const sortedGrouped = {};
+        
+        // First add 1-9 if exists
+        if (grouped['1-9']) {
+            sortedGrouped['1-9'] = grouped['1-9'];
+        }
+        
+        // Then add Russian letters in order
+        for (const letter of russianOrder) {
+            if (grouped[letter]) {
+                sortedGrouped[letter] = grouped[letter];
+            }
+        }
+        
+        return sortedGrouped;
     }
 
     getSortedStreets() {
@@ -3546,30 +3972,32 @@ class TerritoryApp {
         const streetName = document.getElementById("recipient-name").value;
 
         if (!streetName || !this.data[streetName]) {
-            this.showNoResults();
+            this.showNoResults(streetName || "Неизвестная улица");
             return;
         }
 
         const buildings = this.getFilteredBuildings(streetName);
         const resultHtml = this.generateResultsHtml(apartmentNumber, buildings, streetName);
 
-        this.displayResults(resultHtml);
+        this.displayResults(resultHtml, streetName);
         this.closeModal();
     }
 
     getFilteredBuildings(streetName) {
         const buildings = this.data[streetName] || [];
-        const isOddChecked = document.getElementById("odd").checked;
-        const isEvenChecked = document.getElementById("even").checked;
+        
+        // Get selected radio value
+        const selectedRadio = document.querySelector('input[name="house-type"]:checked');
+        const filterType = selectedRadio ? selectedRadio.value : 'all';
 
-        if (!isOddChecked && !isEvenChecked) {
+        if (filterType === 'all') {
             return this.sortBuildings(buildings);
         }
 
         return this.sortBuildings(buildings.filter(building => {
             const buildingNumber = this.extractBuildingNumber(building[0]);
-            if (isOddChecked && buildingNumber % 2 !== 1) return false;
-            if (isEvenChecked && buildingNumber % 2 !== 0) return false;
+            if (filterType === 'odd' && buildingNumber % 2 !== 1) return false;
+            if (filterType === 'even' && buildingNumber % 2 !== 0) return false;
             return true;
         }));
     }
@@ -3631,11 +4059,15 @@ class TerritoryApp {
         return html;
     }
 
-    displayResults(html) {
+    displayResults(html, streetName) {
         if (this.apartmentCount === 0) {
-            this.showNoResults();
+            this.showNoResults(streetName);
             return;
         }
+
+        // Hide letter nav and show street name
+        document.getElementById("letter-nav").style.display = "none";
+        document.querySelector("h1").textContent = streetName;
 
         document.getElementById("territory").innerHTML = html;
 
@@ -3647,7 +4079,11 @@ class TerritoryApp {
         window.scrollTo(0, 0);
     }
 
-    showNoResults() {
+    showNoResults(streetName) {
+        // Hide letter nav and show street name
+        document.getElementById("letter-nav").style.display = "none";
+        document.querySelector("h1").textContent = streetName;
+
         document.getElementById("territory").innerHTML = `
             <button type="button" onclick="listStreets()" class="btn btn-primary">Вернуться</button> 
             <hr>Нет подходящих квартир
@@ -3724,29 +4160,29 @@ document.addEventListener('DOMContentLoaded', () => {
     new TerritoryApp();
 });
 
-        // Modal functionality without Bootstrap
-        function openModal() {
-            document.getElementById('exampleModal').classList.add('show');
-        }
+// Modal functionality without Bootstrap
+function openModal() {
+    document.getElementById('exampleModal').classList.add('show');
+}
 
-        function closeModal() {
-            document.getElementById('exampleModal').classList.remove('show');
-        }
+function closeModal() {
+    document.getElementById('exampleModal').classList.remove('show');
+}
 
-        // Close modal when clicking outside of it
-        window.onclick = function (event) {
-            const modal = document.getElementById('exampleModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
+// Close modal when clicking outside of it
+window.onclick = function (event) {
+    const modal = document.getElementById('exampleModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+}
 
-        // Close modal with Escape key
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        });
+// Close modal with Escape key
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
     </script>
 
 </body>
