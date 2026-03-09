@@ -318,6 +318,9 @@
                     </div>
                     <div class="modal-body">
                         <form>
+                            <div class="form-group" style="display: none;">
+                                <input type="text" class="form-control" id="recipient-name">
+                            </div>
                             <div class="form-group">
                                 <label style="font-weight: 600; margin-bottom: 8px; display: block;">Тип домов:</label>
                                 <div class="radio-group">
@@ -3841,11 +3844,12 @@ class TerritoryApp {
         // Clear existing buttons
         container.innerHTML = '';
 
-        const fragment = document.createDocumentFragment();
-
         // Get the step from the selector
         const stepSelector = document.getElementById("step-selector");
         const step = stepSelector ? parseInt(stepSelector.value) : 20;
+
+        // Store reference to this
+        const self = this;
 
         // Show buttons from 1 to step value
         const maxButton = step;
@@ -3855,11 +3859,14 @@ class TerritoryApp {
             button.type = "button";
             button.className = "btn";
             button.textContent = i.toString();
-            button.onclick = () => this.searchApartments(i);
-            fragment.appendChild(button);
+            // Use closure to capture the correct value
+            (function(num) {
+                button.onclick = function() {
+                    self.searchApartments(num);
+                };
+            })(i);
+            container.appendChild(button);
         }
-
-        container.appendChild(fragment);
     }
 
     displayStreets() {
@@ -3973,6 +3980,7 @@ class TerritoryApp {
 
         if (!streetName || !this.data[streetName]) {
             this.showNoResults(streetName || "Неизвестная улица");
+            this.closeModal();
             return;
         }
 
